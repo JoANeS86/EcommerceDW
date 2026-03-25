@@ -11,19 +11,19 @@
 
 ## Project Structure
 EcommerceDW
-│
-├── data/          # Raw data files, CSVs, JSONs, backups
-├── logs/          # Pipeline logs
-├── python/        # Python scripts for ETL
-│   ├── extract/ → code to extract data from APIs or simulators
-│   ├── transform/` → data cleaning and transformation
-│   ├── load/ → load data into SQL Server
-│   ├── utils/ → reusable functions, logging
-│   └── config/ → configuration files
-├── sql/           # SQL scripts (staging tables, DW tables, etc.)
-├── tests/         # Unit tests and pipeline tests
-├── docs/          # Project documentation (data scope, pipeline scope, logging)
-└── README.md      # Project documentation
+
+    data/          # Raw data files, CSVs, JSONs, backups
+    logs/          # Pipeline logs
+    python/        # Python scripts for ETL
+        extract/ → code to extract data from APIs or simulators
+        transform/` → data cleaning and transformation
+        load/ → load data into SQL Server
+        utils/ → reusable functions, logging
+        config/ → configuration files
+    sql/           # SQL scripts (staging tables, DW tables, etc.)
+    tests/         # Unit tests and pipeline tests
+    docs/          # Project documentation (data scope, pipeline scope, logging)
+    README.md      # Project documentation
 
 ## Tech Stack
 - Python 3.14
