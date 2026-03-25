@@ -11,7 +11,6 @@
 
 ## Project Structure
     EcommerceDW
-
         data/          # Raw data files, CSVs, JSONs, backups
         logs/          # Pipeline logs
         python/        # Python scripts for ETL
