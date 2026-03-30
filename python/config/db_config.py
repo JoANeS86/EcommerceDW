@@ -1,3 +1,9 @@
+"""
+-----------------------------------
+       SQL Server Connection
+-----------------------------------
+"""
+
 import sqlalchemy as sa
 
 try:

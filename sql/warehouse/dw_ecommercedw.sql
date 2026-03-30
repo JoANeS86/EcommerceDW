@@ -2,10 +2,6 @@
 ===================================================================
             Create database EcommerceDW: DW Schema
 ===================================================================
-
--- We're utilizing AdventureWorks2022.bak to restore the database.
--- Once restored, we're adding the staging tables described below.
-
 */
 
 
