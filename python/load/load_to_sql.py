@@ -15,9 +15,17 @@ the correct schema based on the DataFrame you're loading.
 import pandas as pd
 
 def load_orders(df, engine):
-    df.to_sql(
-        "EcommerceDW.Staging.APIStgOrders",
-        con=engine,
-        if_exists="replace",
-        index=False
-    )
+    try:
+        print(f"Loading {len(df)} rows into Staging.APIStgOrders...")
+        
+        # Try loading data into SQL Server
+        df.to_sql(
+            "APIStgOrders",  # Table name
+            con=engine,
+            schema="Staging",  # Ensure the schema is correct
+            if_exists="replace",  # Overwrite if table exists
+            index=False
+        )
+        print("Data load successful!")
+    except Exception as e:
+        print(f"Error while loading data: {e}")
