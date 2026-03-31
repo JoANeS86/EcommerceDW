@@ -8,7 +8,7 @@ from extract.api_simulator import get_orders_api
 from transform.clean_orders import validate_orders
 from load.load_to_sql import load_orders
 from utils.logger import get_logger
-from config import engine
+from config.db_config import engine
 
 logger = get_logger("orders_pipeline", "orders_pipeline.log")
 

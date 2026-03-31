@@ -18,6 +18,6 @@ def load_orders(df, engine):
     df.to_sql(
         "EcommerceDW.Staging.APIStgOrders",
         con=engine,
-        if_exists="append",
+        if_exists="replace",
         index=False
     )

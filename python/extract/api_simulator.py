@@ -39,7 +39,7 @@ def generate_orders(n_orders=1000):
 
 def get_orders_api():
     try:
-        data = generate_orders(1000)
+        data = generate_orders(100000)
         return {"status": "success", "data": data}
     except Exception as e:
         return {"status": "error", "message": str(e)}
