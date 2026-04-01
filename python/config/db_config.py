@@ -6,24 +6,39 @@
 
 import urllib.parse
 import sqlalchemy as sa
-from sqlalchemy import text  # Import the text function
+from sqlalchemy import text
 
-try:
-    # Update the connection string for LocalDB
+
+def get_engine():
+    """
+    Creates and returns a SQLAlchemy engine for SQL Server.
+    No side effects (safe to import).
+    """
     params = urllib.parse.quote_plus(
-        "DRIVER={ODBC Driver 17 for SQL Server};SERVER=(localdb)\\Local;DATABASE=EcommerceDW;Trusted_Connection=yes"
+        "DRIVER={ODBC Driver 17 for SQL Server};"
+        "SERVER=(localdb)\\Local;"
+        "DATABASE=EcommerceDW;"
+        "Trusted_Connection=yes"
     )
-    
+
     engine = sa.create_engine(f"mssql+pyodbc:///?odbc_connect={params}")
-    
-    # Test the connection
-    with engine.connect() as conn:
-        print("Connection successful!")
 
-    # Check the current database
-    with engine.connect() as conn:
-        result = conn.execute(text("SELECT DB_NAME()"))  # Wrap the query with text()
-        print(f"Connected to database: {result.fetchone()[0]}")
+    return engine
 
-except Exception as e:
-    print(f"Error: {e}")
+
+def test_connection(engine):
+    """
+    Optional helper to test DB connection.
+    Should be called explicitly (not on import).
+    """
+    try:
+        with engine.connect() as conn:
+            result = conn.execute(text("SELECT DB_NAME()"))
+            db_name = result.fetchone()[0]
+            print(f"Connected successfully to database: {db_name}")
+    except Exception as e:
+        print(f"Connection failed: {e}")
+
+
+# Create a reusable engine instance
+engine = get_engine()

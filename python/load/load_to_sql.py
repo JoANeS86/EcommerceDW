@@ -14,18 +14,24 @@ the correct schema based on the DataFrame you're loading.
 
 import pandas as pd
 
-def load_orders(df, engine):
+def load_orders(df, engine, logger=None):
     try:
-        print(f"Loading {len(df)} rows into Staging.APIStgOrders...")
-        
-        # Try loading data into SQL Server
+        if logger:
+            logger.info(f"Loading {len(df)} rows into Staging.APIStgOrders")
+
         df.to_sql(
-            "APIStgOrders",  # Table name
+            "APIStgOrders",
             con=engine,
-            schema="Staging",  # Ensure the schema is correct
-            if_exists="replace",  # Overwrite if table exists
+            schema="Staging",
+            if_exists="append",
             index=False
         )
-        print("Data load successful!")
+
+        if logger:
+            logger.info("Data load successful")
+
     except Exception as e:
-        print(f"Error while loading data: {e}")
+        if logger:
+            logger.error(f"Error while loading data: {e}")
+        else:
+            print(f"Error while loading data: {e}")

@@ -5,12 +5,12 @@
 """
 
 import random
-from datetime import datetime, timedelta
+from datetime import datetime
 from faker import Faker
 
 fake = Faker()
 
-def generate_orders(n_orders=1000):
+def generate_orders(n_orders=100000):
     orders = []
 
     start_date = datetime(2021, 1, 1)
@@ -22,9 +22,25 @@ def generate_orders(n_orders=1000):
         order = {
             "order_id": i + 1,
             "customer_id": random.randint(1, 1000),
-            "order_date": order_date,
-            "amount": round(random.uniform(10, 500), 2),
-            "status": random.choice(["completed", "pending", "cancelled"])
+
+            # Inject bad data
+            "order_date": random.choices(
+                [order_date, None],
+                weights=[0.97, 0.03]
+            )[0],
+
+            "amount": random.choices([
+                round(random.uniform(10, 500), 2),
+                -round(random.uniform(1, 100), 2),
+                None
+                ],
+                weights=[0.90, 0.07, 0.03]
+            )[0],
+
+            "status": random.choices(
+                ["completed", "pending", "cancelled", None],
+                weights=[0.70, 0.15, 0.10, 0.05]
+            )[0]
         }
 
         orders.append(order)
@@ -38,8 +54,12 @@ def generate_orders(n_orders=1000):
 """
 
 def get_orders_api():
+    # Simulate API failure (20% chance)
+    if random.random() < 0.2:
+        return {"status": "error", "message": "Simulated API failure"}
+
     try:
-        data = generate_orders(100000)
+        data = generate_orders()
         return {"status": "success", "data": data}
     except Exception as e:
         return {"status": "error", "message": str(e)}

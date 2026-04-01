@@ -15,23 +15,35 @@ logger = get_logger("orders_pipeline", "orders_pipeline.log")
 def run_pipeline():
     logger.info("Starting pipeline")
 
-    response = get_orders_api()
+    # Retry logic
+    max_retries = 3
+    attempt = 0
+
+    while attempt < max_retries:
+        response = get_orders_api()
+
+        if response["status"] == "success":
+            logger.info(f"API call successful on attempt {attempt + 1}")
+            break
+        else:
+            logger.warning(f"API failed on attempt {attempt + 1}: {response['message']}")
+            attempt += 1
 
     if response["status"] != "success":
-        logger.error("API failed")
+        logger.error("API failed after maximum retries")
         return
 
     raw_data = response["data"]
 
-    clean_df = validate_orders(raw_data)
+    clean_df = validate_orders(raw_data, logger)
 
     if clean_df.empty:
-        logger.warning("No valid data to load")
+        logger.warning("No valid data to load after validation")
         return
 
-    load_orders(clean_df, engine)
+    load_orders(clean_df, engine, logger)
 
-    logger.info(f"Loaded {len(clean_df)} records successfully")
+    logger.info(f"Pipeline completed successfully. Loaded {len(clean_df)} records")
 
 
 if __name__ == "__main__":
