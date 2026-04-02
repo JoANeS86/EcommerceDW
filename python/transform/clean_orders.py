@@ -6,6 +6,7 @@
 
 import pandas as pd
 
+
 def validate_orders(data, logger=None):
     df = pd.DataFrame(data)
 

@@ -14,6 +14,7 @@ the correct schema based on the DataFrame you're loading.
 
 import pandas as pd
 
+
 def load_orders(df, engine, logger=None):
     try:
         if logger:

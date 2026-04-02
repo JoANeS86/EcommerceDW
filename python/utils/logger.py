@@ -7,6 +7,7 @@
 import os
 import logging
 
+
 def get_logger(name, log_file):
     logger = logging.getLogger(name)
     logger.setLevel(logging.INFO)

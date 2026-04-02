@@ -7,6 +7,8 @@
 from extract.api_simulator import get_orders_api
 from transform.clean_orders import validate_orders
 from load.load_to_sql import load_orders
+from load.get_existing_orders import get_existing_order_ids
+from load.watermark import get_watermark, update_watermark
 from utils.logger import get_logger
 from config.db_config import engine
 
@@ -41,18 +43,70 @@ def run_pipeline():
         # -------------------------------
         # VALIDATION
         # -------------------------------
-        clean_df = validate_orders(raw_data, logger)
+        df = validate_orders(raw_data, logger)
 
-        if clean_df.empty:
-            logger.warning("No valid data to load after validation")
+        if df.empty:
+            logger.warning("No valid data after validation")
+            return
+
+        # -------------------------------
+        # WATERMARK FILTER (TIME-BASED)
+        # -------------------------------
+        watermark = get_watermark(engine, "orders_pipeline")
+        logger.info(f"Current watermark: {watermark}")
+
+        logger.info(f"Max order_date in batch: {df['order_date'].max()}")
+
+        before_watermark = len(df)
+
+        df = df[df["order_date"] > watermark]
+
+        after_watermark = len(df)
+
+        logger.info(f"Records before watermark filter: {before_watermark}")
+        logger.info(f"Records after watermark filter: {after_watermark}")
+        logger.info(f"Filtered out {before_watermark - after_watermark} old records")
+
+        if df.empty:
+            logger.warning("No new data after watermark filtering")
+            return
+
+        # -------------------------------
+        # INCREMENTAL FILTER (ID-BASED)
+        # -------------------------------
+        existing_ids = get_existing_order_ids(engine)
+
+        before_incremental = len(df)
+
+        df = df[~df["order_id"].isin(existing_ids)]
+
+        after_incremental = len(df)
+
+        logger.info(f"Records before incremental filter: {before_incremental}")
+        logger.info(f"Records after incremental filter: {after_incremental}")
+        logger.info(f"Filtered out {before_incremental - after_incremental} existing records")
+
+        if df.empty:
+            logger.warning("No new data after incremental filtering")
             return
 
         # -------------------------------
         # LOAD
         # -------------------------------
-        load_orders(clean_df, engine, logger)
+        load_orders(df, engine, logger)
 
-        logger.info(f"Pipeline completed successfully. Loaded {len(clean_df)} records")
+        logger.info(f"Loaded {len(df)} new records")
+
+        # -------------------------------
+        # UPDATE WATERMARK
+        # -------------------------------
+        new_watermark = df["order_date"].max()
+
+        update_watermark(engine, "orders_pipeline", new_watermark)
+
+        logger.info(f"Watermark updated to: {new_watermark}")
+
+        logger.info("Pipeline completed successfully")
 
     except Exception as e:
         logger.exception(f"Pipeline failed: {e}")
