@@ -7,6 +7,7 @@
 import random
 from datetime import datetime
 from faker import Faker
+import uuid
 
 fake = Faker()
 
@@ -20,7 +21,7 @@ def generate_orders(n_orders=100000):
         order_date = fake.date_time_between(start_date=start_date, end_date=end_date)
 
         order = {
-            "order_id": i + 1,
+            "order_id": str(uuid.uuid4()),
             "customer_id": random.randint(1, 1000),
 
             # Inject bad data

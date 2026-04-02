@@ -24,7 +24,8 @@ def load_orders(df, engine, logger=None):
             con=engine,
             schema="Staging",
             if_exists="append",
-            index=False
+            index=False,
+            chunksize=10000
         )
 
         if logger:
@@ -33,5 +34,4 @@ def load_orders(df, engine, logger=None):
     except Exception as e:
         if logger:
             logger.error(f"Error while loading data: {e}")
-        else:
-            print(f"Error while loading data: {e}")
+        raise
