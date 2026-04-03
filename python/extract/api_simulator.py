@@ -17,11 +17,13 @@ def generate_orders(n_orders=100000):
     start_date = datetime(2021, 1, 1)
     end_date = datetime(2025, 12, 31)
 
+    duplicate_id = str(uuid.uuid4())  # fixed duplicate
+
     for i in range(n_orders):
         order_date = fake.date_time_between(start_date=start_date, end_date=end_date)
 
         order = {
-            "order_id": str(uuid.uuid4()),
+            "order_id": duplicate_id if i % 5000 == 0 else str(uuid.uuid4()),
             "customer_id": random.randint(1, 1000),
 
             # Inject bad data

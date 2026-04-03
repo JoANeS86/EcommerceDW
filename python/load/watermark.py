@@ -5,6 +5,7 @@
 """
 
 from sqlalchemy import text
+from datetime import datetime
 
 
 def get_watermark(engine, pipeline_name):
@@ -16,6 +17,10 @@ def get_watermark(engine, pipeline_name):
 
     with engine.connect() as conn:
         result = conn.execute(query, {"pipeline_name": pipeline_name}).fetchone()
+
+    # Fallback protection
+    if result is None or result[0] is None:
+        return datetime(1900, 1, 1)
 
     return result[0]
 

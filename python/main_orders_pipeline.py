@@ -11,6 +11,8 @@ from load.get_existing_orders import get_existing_order_ids
 from load.watermark import get_watermark, update_watermark
 from utils.logger import get_logger
 from config.db_config import engine
+from datetime import timedelta
+from datetime import datetime
 
 logger = get_logger("orders_pipeline", "orders_pipeline.log")
 
@@ -40,6 +42,10 @@ def run_pipeline():
 
         raw_data = response["data"]
 
+        if not raw_data:
+            logger.warning("API returned empty dataset")
+            return
+
         # -------------------------------
         # VALIDATION
         # -------------------------------
@@ -48,6 +54,21 @@ def run_pipeline():
         if df.empty:
             logger.warning("No valid data after validation")
             return
+        
+        # -------------------------------
+        # FUTURE DATE FILTER
+        # -------------------------------
+        today = datetime.now()
+
+        before_future_filter = len(df)
+
+        df = df[df["order_date"] <= today]
+
+        after_future_filter = len(df)
+
+        logger.info(f"Records before future-date filter: {before_future_filter}")
+        logger.info(f"Records after future-date filter: {after_future_filter}")
+        logger.info(f"Filtered out {before_future_filter - after_future_filter} future records")
 
         # -------------------------------
         # WATERMARK FILTER (TIME-BASED)
@@ -70,6 +91,26 @@ def run_pipeline():
         if df.empty:
             logger.warning("No new data after watermark filtering")
             return
+        
+        # -------------------------------
+        # WATERMARK FILTER (WITH BUFFER)
+        # -------------------------------
+        watermark = get_watermark(engine, "orders_pipeline")
+
+        buffer_days = 3
+        adjusted_watermark = watermark - timedelta(days=buffer_days)
+
+        logger.info(f"Current watermark: {watermark}")
+        logger.info(f"Adjusted watermark (with {buffer_days}d buffer): {adjusted_watermark}")
+
+        before_watermark = len(df)
+
+        df = df[df["order_date"] > adjusted_watermark]
+
+        after_watermark = len(df)
+
+        logger.info(f"Records before watermark filter: {before_watermark}")
+        logger.info(f"Records after watermark filter: {after_watermark}")
 
         # -------------------------------
         # INCREMENTAL FILTER (ID-BASED)
