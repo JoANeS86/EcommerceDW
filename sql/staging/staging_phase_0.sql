@@ -1,6 +1,6 @@
 /*
 ===================================================================
-            Create database EcommerceDW: Staging Schema
+       Create database EcommerceDW: Staging Schema / Phase 0
 ===================================================================
 
 -- We're utilizing AdventureWorks2022.bak to restore the database.
@@ -169,21 +169,21 @@ SELECT TOP 10 * FROM Staging.AWStgSales;
 -- We're also adding some Placeholder Tables for the rest of the data sources.
 
 
--- Orders (simulated/API)
+-- Orders staging (simulated/API)
 CREATE TABLE Staging.APIStgOrders (ID INT);
 GO
 
 	
--- Payments (simulated/API)
+-- Payments staging (simulated/API)
 CREATE TABLE Staging.APIStgPayments (ID INT);
 GO
 	
 
--- Web events (JSON)
+-- Web events staging (JSON)
 CREATE TABLE Staging.JSONStgWebEvents (ID INT);
 GO
 	
 
--- Campaigns (CSV)
+-- Campaigns staging (CSV)
 CREATE TABLE Staging.CSVStgCampaigns (ID INT);
 GO
