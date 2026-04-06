@@ -27,12 +27,12 @@ ALTER COLUMN order_id VARCHAR(50);
 
 
 -- Watermark staging
-CREATE TABLE Staging.ETL_Watermark (
+CREATE TABLE Staging.ETLWatermark (
     pipeline_name VARCHAR(100) PRIMARY KEY,
     last_order_date DATETIME
 );
 
 
 -- Populate Watermark (initial value)
-INSERT INTO Staging.ETL_Watermark (pipeline_name, last_order_date)
+INSERT INTO Staging.ETLWatermark (pipeline_name, last_order_date)
 VALUES ('orders_pipeline', '1900-01-01');
