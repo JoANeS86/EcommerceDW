@@ -7,7 +7,6 @@
 from extract.api_simulator import get_orders_api
 from transform.clean_orders import validate_orders
 from load.load_to_sql import load_orders
-from load.get_existing_orders import get_existing_order_ids
 from load.watermark import get_watermark, update_watermark
 from utils.logger import get_logger
 from config.db_config import engine
@@ -70,28 +69,10 @@ def run_pipeline():
         logger.info(f"Records after future-date filter: {after_future_filter}")
         logger.info(f"Filtered out {before_future_filter - after_future_filter} future records")
 
-        # -------------------------------
-        # WATERMARK FILTER (TIME-BASED)
-        # -------------------------------
-        watermark = get_watermark(engine, "orders_pipeline")
-        logger.info(f"Current watermark: {watermark}")
-
-        logger.info(f"Max order_date in batch: {df['order_date'].max()}")
-
-        before_watermark = len(df)
-
-        df = df[df["order_date"] > watermark]
-
-        after_watermark = len(df)
-
-        logger.info(f"Records before watermark filter: {before_watermark}")
-        logger.info(f"Records after watermark filter: {after_watermark}")
-        logger.info(f"Filtered out {before_watermark - after_watermark} old records")
-
         if df.empty:
-            logger.warning("No new data after watermark filtering")
+            logger.warning("No data after future-date filtering")
             return
-        
+
         # -------------------------------
         # WATERMARK FILTER (WITH BUFFER)
         # -------------------------------
@@ -111,24 +92,10 @@ def run_pipeline():
 
         logger.info(f"Records before watermark filter: {before_watermark}")
         logger.info(f"Records after watermark filter: {after_watermark}")
-
-        # -------------------------------
-        # INCREMENTAL FILTER (ID-BASED)
-        # -------------------------------
-        existing_ids = get_existing_order_ids(engine)
-
-        before_incremental = len(df)
-
-        df = df[~df["order_id"].isin(existing_ids)]
-
-        after_incremental = len(df)
-
-        logger.info(f"Records before incremental filter: {before_incremental}")
-        logger.info(f"Records after incremental filter: {after_incremental}")
-        logger.info(f"Filtered out {before_incremental - after_incremental} existing records")
+        logger.info(f"Filtered out {before_watermark - after_watermark} old records")
 
         if df.empty:
-            logger.warning("No new data after incremental filtering")
+            logger.warning("No new data after watermark filtering")
             return
 
         # -------------------------------
