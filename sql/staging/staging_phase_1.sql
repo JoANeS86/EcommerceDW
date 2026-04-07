@@ -36,3 +36,13 @@ CREATE TABLE Staging.ETLWatermark (
 -- Populate Watermark (initial value)
 INSERT INTO Staging.ETLWatermark (pipeline_name, last_order_date)
 VALUES ('orders_pipeline', '1900-01-01');
+
+
+-- Orders load staging
+CREATE TABLE Staging.APIStgOrdersLoad (
+    order_id VARCHAR(50),
+    customer_id INT,
+    order_date DATETIME,
+    amount FLOAT,
+    status VARCHAR(50)
+);

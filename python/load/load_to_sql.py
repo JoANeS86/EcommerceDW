@@ -12,16 +12,20 @@ the correct schema based on the DataFrame you're loading.
 
 """
 
-import pandas as pd
-
+from sqlalchemy import text
 
 def load_orders(df, engine, logger=None):
     try:
         if logger:
-            logger.info(f"Loading {len(df)} rows into Staging.APIStgOrders")
+            logger.info(f"Loading {len(df)} rows into staging load table")
 
+        # Step 1: Truncate load table
+        with engine.begin() as conn:
+            conn.execute(text("TRUNCATE TABLE Staging.APIStgOrdersLoad"))
+
+        # Step 2: Load into staging load table
         df.to_sql(
-            "APIStgOrders",
+            "APIStgOrdersLoad",
             con=engine,
             schema="Staging",
             if_exists="append",
@@ -30,9 +34,26 @@ def load_orders(df, engine, logger=None):
         )
 
         if logger:
-            logger.info("Data load successful")
+            logger.info("Data loaded into staging load table")
+
+        # Step 3: MERGE into final table
+        merge_sql = """
+        MERGE INTO Staging.APIStgOrders AS target
+        USING Staging.APIStgOrdersLoad AS source
+        ON target.order_id = source.order_id
+
+        WHEN NOT MATCHED BY TARGET THEN
+            INSERT (order_id, customer_id, order_date, amount, status)
+            VALUES (source.order_id, source.customer_id, source.order_date, source.amount, source.status);
+        """
+
+        with engine.begin() as conn:
+            conn.execute(text(merge_sql))
+
+        if logger:
+            logger.info("MERGE completed successfully")
 
     except Exception as e:
         if logger:
-            logger.error(f"Error while loading data: {e}")
+            logger.error(f"Error during MERGE load: {e}")
         raise
