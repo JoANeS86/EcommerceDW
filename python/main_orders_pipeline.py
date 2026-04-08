@@ -4,9 +4,9 @@
 -----------------------------------
 """
 
-from extract.api_simulator import get_orders_api
+from extract.api_orders_simulator import get_orders_api
 from transform.clean_orders import validate_orders
-from load.load_to_sql import load_orders
+from load.load_orders import load_orders
 from load.watermark import get_watermark, update_watermark
 from utils.logger import get_logger
 from config.db_config import engine
