@@ -46,3 +46,35 @@ CREATE TABLE Staging.APIStgOrdersLoad (
     amount FLOAT,
     status VARCHAR(50)
 );
+
+
+-- Alter staging tables
+
+
+-- Payments staging
+DROP TABLE IF EXISTS Staging.APIStgPayments;
+
+CREATE TABLE Staging.APIStgPayments (
+    payment_id UNIQUEIDENTIFIER PRIMARY KEY,
+    order_id UNIQUEIDENTIFIER,
+    payment_date DATETIME,
+    amount DECIMAL(10,2),
+    payment_method VARCHAR(50),
+    status VARCHAR(50)
+);
+
+
+-- Payments load staging
+CREATE TABLE Staging.APIStgPaymentsLoad (
+    payment_id UNIQUEIDENTIFIER,
+    order_id UNIQUEIDENTIFIER,
+    payment_date DATETIME,
+    amount DECIMAL(10,2),
+    payment_method VARCHAR(50),
+    status VARCHAR(50)
+);
+
+
+-- Update Watermark
+INSERT INTO Staging.ETLWatermark (pipeline_name, last_order_date)
+VALUES ('payments_pipeline', '1900-01-01');
