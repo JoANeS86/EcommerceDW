@@ -36,12 +36,15 @@ It focuses on building scalable ETL pipelines, handling data quality issues, and
 The platform is structured into multiple layers:
 
 * **Staging Layer**
+
   Raw data ingestion from APIs and external sources
 
 * **ETL Pipelines (Python)**
+
   Data extraction, validation, and incremental loading
 
 * **Data Warehouse Layer (in progress)**
+  
   Star schema design (Facts + Dimensions) for analytics
 
 ---
