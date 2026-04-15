@@ -4,6 +4,10 @@ EcommerceDW is a production-style data engineering project that simulates a real
 
 It focuses on building scalable ETL pipelines, handling data quality issues, and designing a data warehouse for analytics.
 
+<p align="center">
+<img src="https://github.com/user-attachments/assets/b414665c-6b38-4296-805f-eb7667dd3d68" />
+</p>
+
 ---
 
 ### Business Model
@@ -28,24 +32,6 @@ It focuses on building scalable ETL pipelines, handling data quality issues, and
 * Payments (linked to orders)
 * Web Events *(planned)*
 * Campaigns *(planned)*
-
----
-
-### Architecture
-
-The platform is structured into multiple layers:
-
-* **Staging Layer**
-
-  Raw data ingestion from APIs and external sources
-
-* **ETL Pipelines (Python)**
-
-  Data extraction, validation, and incremental loading
-
-* **Data Warehouse Layer (in progress)**
-  
-  Star schema design (Facts + Dimensions) for analytics
 
 ---
 
