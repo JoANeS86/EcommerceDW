@@ -5,6 +5,11 @@
 
 */
 
+
+CREATE SCHEMA DW;
+GO
+
+
 -- Create DimDate
 CREATE TABLE DW.DimDate (
 	date_key INT,
@@ -222,6 +227,7 @@ BEGIN
         -- Customer dimension
         INNER JOIN DW.DimCustomer dc
             ON o.customer_id = dc.customer_id
+            AND dc.is_current = 1
 
         -- Date dimension
         INNER JOIN DW.DimDate dd
