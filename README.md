@@ -1,35 +1,122 @@
-# EcommerceDW Project
+## EcommerceDW Project
 
-## Business Model
+EcommerceDW is a production-style data engineering project that simulates a real-world e-commerce platform.
+
+It focuses on building scalable ETL pipelines, handling data quality issues, and designing a data warehouse for analytics.
+
+<p align="center">
+<img src="https://github.com/user-attachments/assets/b414665c-6b38-4296-805f-eb7667dd3d68" />
+</p>
+
+---
+
+### Business Model
 - **Order**: customer buys product(s)
 - **Payment**: transaction attempt
 - **Sale**: successful payment
 
-## Data Sources
-- AdventureWorks database for core tables (Customers, Products, Sales, Territories)
-- Synthetic/API data for Orders, Payments, Web Events, Campaigns
+---
 
-## Project Structure
-    EcommerceDW
-        data/          # Raw data files, CSVs, JSONs, backups
-        logs/          # Pipeline logs
-        python/        # Python scripts for ETL
-            extract/ → code to extract data from APIs or simulators
-            transform/` → data cleaning and transformation
-            load/ → load data into SQL Server
-            utils/ → reusable functions, logging
-            config/ → configuration files
-        sql/           # SQL scripts (staging tables, DW tables, etc.)
-        tests/         # Unit tests and pipeline tests
-        docs/          # Project documentation (data scope, pipeline scope, logging)
-        README.md      # Project documentation
+### Data Sources
 
-## Tech Stack
-- Python 3.14
-- SQL Server LocalDB
-- SQLAlchemy + pyodbc
+#### 1. AdventureWorks (SQL Server)
 
-## Documentation
+* Customers
+* Products
+* Sales
+* Territories
+
+#### 2. Synthetic / API Data
+
+* Orders (core entity)
+* Payments (linked to orders)
+* Web Events *(planned)*
+* Campaigns *(planned)*
+
+---
+
+### Key Features
+
+* **Incremental processing**
+
+  * Watermark-based filtering
+  * 3-day buffer for late-arriving data
+
+* **Data quality validation**
+
+  * Null handling
+  * Duplicate removal
+  * Invalid value filtering
+
+* **Referential integrity**
+
+  * Payments validated against existing orders
+
+* **SQL MERGE loading strategy**
+
+  * Staging → final tables
+  * Insert-only incremental loads
+
+* **Observability**
+
+  * Logging of record counts and pipeline steps
+  * API retry logic and error handling
+
+* **Real-world simulation**
+
+  * API failures
+  * Bad data injection
+  * Inconsistent relationships
+
+---
+
+### Project Structure
+
+```
+EcommerceDW/
+│
+├── data/          # Raw data files (CSV, JSON, backups)
+├── logs/          # Pipeline logs
+├── python/        # ETL pipelines
+│   ├── extract/   # API simulators
+│   ├── transform/ # Data validation & cleaning
+│   ├── load/      # Load logic (MERGE, watermark)
+│   ├── utils/     # Logging and helpers
+│   └── config/    # Database configuration
+│
+├── sql/           # SQL scripts (staging, DW)
+├── tests/         # Pipeline tests
+├── docs/          # Documentation
+└── README.md
+```
+
+---
+
+### Tech Stack
+
+* Python 3.14
+* SQL Server (LocalDB)
+* SQLAlchemy + pyodbc
+
+---
+
+### Current Status
+
+    ✅ Orders pipeline (complete)
+    ✅ Payments pipeline (complete)
+    🚧 Data Warehouse layer (in progress)
+
+---
+
+### Documentation
 - **Synthetic Data Scope:** [docs/data_scope.md](docs/data_scope.md)
 - **Pipeline Scope:** [docs/pipelines.md](docs/pipelines.md)
 - **Logging Strategy:** [docs/logging.md](docs/logging.md)
+
+---
+
+### Next Steps
+
+* Build **FactOrders** table
+* Design **dimension tables**
+* Add **analytics use cases** (cohorts, fraud detection)
