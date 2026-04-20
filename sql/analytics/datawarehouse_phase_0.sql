@@ -214,10 +214,9 @@ BEGIN
         )
         SELECT
             o.order_id,
-            dc.customer_key,
+            ISNULL(dc.customer_key, -1),
             dd.date_key,
             o.amount,
-
             ISNULL(p.total_paid_amount, 0),
             ISNULL(p.payment_count, 0),
             ISNULL(p.has_failed_payment, 0)
@@ -225,9 +224,13 @@ BEGIN
         FROM Staging.APIStgOrders o
 
         -- Customer dimension
-        INNER JOIN DW.DimCustomer dc
+        LEFT JOIN DW.DimCustomer dc
             ON o.customer_id = dc.customer_id
-            AND dc.is_current = 1
+            AND o.order_date >= dc.valid_from
+            AND (
+                dc.valid_to IS NULL
+                OR o.order_date < dc.valid_to
+            )
 
         -- Date dimension
         INNER JOIN DW.DimDate dd

@@ -48,7 +48,7 @@ BEGIN
             o.customer_id,
             'Unknown',
             'API',
-            GETDATE(),
+            '1900-01-01',
             NULL,
             1
         FROM Staging.APIStgOrders o
@@ -140,3 +140,45 @@ FROM DW.FactOrders f
 LEFT JOIN DW.DimDate d
     ON f.date_key = d.date_key
 WHERE d.date_key IS NULL;
+
+
+/*
+Addition of Optional Metrics
+
+    - Make your Fact table analytically powerful
+    - Show business thinking, not just engineering
+
+*/
+
+
+ALTER TABLE DW.FactOrders
+ADD 
+    order_count AS (1) PERSISTED,
+    is_fully_paid AS (
+        CASE 
+            WHEN total_paid_amount >= order_amount THEN 1
+            ELSE 0
+        END
+    ) PERSISTED,
+    payment_gap AS (
+        order_amount - total_paid_amount
+    ) PERSISTED;
+
+
+-- Addition of Unknown Member (to avoid broken joins in real systems)
+
+
+SET IDENTITY_INSERT DW.DimCustomer ON;
+
+INSERT INTO DW.DimCustomer (
+    customer_key,
+    customer_id,
+    customer_name,
+    source_system,
+    valid_from,
+    valid_to,
+    is_current
+)
+VALUES (-1, -1, 'Unknown', 'System', '1900-01-01', NULL, 1);
+
+SET IDENTITY_INSERT DW.DimCustomer OFF;
