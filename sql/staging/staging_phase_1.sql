@@ -15,15 +15,12 @@ but SQL table expects order_id BIGINT
 */
 
 
--- Alter staging tables
+-- Create/Alter staging tables
 
 
 -- Orders staging (simulated/API)
 ALTER TABLE Staging.APIStgOrders
 ALTER COLUMN order_id VARCHAR(50);
-
-
--- Create staging tables
 
 
 -- Watermark staging
@@ -46,9 +43,6 @@ CREATE TABLE Staging.APIStgOrdersLoad (
     amount FLOAT,
     status VARCHAR(50)
 );
-
-
--- Alter staging tables
 
 
 -- Payments staging

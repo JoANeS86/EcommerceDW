@@ -13,7 +13,7 @@ def get_logger(name, log_file):
     logger.setLevel(logging.INFO)
 
     # Absolute path to logs folder at project root
-    project_root = os.path.dirname(os.path.dirname(__file__))  # EcommerceDW
+    project_root = os.path.dirname(os.path.dirname(__file__))
     log_path = os.path.join(project_root, "logs")
     os.makedirs(log_path, exist_ok=True)
 
