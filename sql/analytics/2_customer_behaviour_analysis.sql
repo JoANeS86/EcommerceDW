@@ -9,14 +9,14 @@
 -- Customer Lifetime Value (CLV)
 
 
+CREATE VIEW Analytics.VwCustomerLifetimeValue AS
 SELECT
     customer_key,
     COUNT(*) AS total_orders,
     SUM(order_amount) AS lifetime_value,
     AVG(order_amount) AS avg_order_value
 FROM DW.FactOrders
-GROUP BY customer_key
-ORDER BY lifetime_value DESC;
+GROUP BY customer_key;
 
 
 -- Repeat vs One-time Customers

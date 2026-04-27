@@ -16,7 +16,7 @@ VALUES ('fact_orders_load', '1900-01-01');
 -- Update Fact Orders Stored Procedure (Incremental)
 
 
-CREATE OR ALTER PROCEDURE DW.sp_LoadFactOrders_Incremental
+CREATE OR ALTER PROCEDURE DW.SPLoadFactOrdersIncremental
 AS
 BEGIN
     SET NOCOUNT ON;

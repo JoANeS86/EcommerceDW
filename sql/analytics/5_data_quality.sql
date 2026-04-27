@@ -15,7 +15,7 @@ WHERE payment_gap > 100
    OR (has_failed_payment = 1 AND is_fully_paid = 0);
 
 
-   -- Unknown Customers Usage
+-- Unknown Customers Usage
 
 
 SELECT
