@@ -1,3 +1,9 @@
+"""
+-----------------------------------
+         Payments Pipeline
+-----------------------------------
+"""
+
 from extract.api_payments_simulator import get_payments_api
 from transform.clean_payments import validate_payments
 from load.load_payments import load_payments
