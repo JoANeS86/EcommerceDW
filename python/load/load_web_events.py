@@ -45,7 +45,7 @@ def load_web_events(df, engine, logger=None):
         # MERGE INTO FINAL TABLE
         # -------------------------------
         merge_sql = """
-        MERGE INTO Staging.APIStgWebEvents AS target
+        MERGE INTO Staging.JSONStgWebEvents AS target
         USING Staging.JSONStgWebEventsLoad AS source
         ON target.event_id = source.event_id
 
