@@ -32,3 +32,16 @@ ON DW.FactOrders(is_fully_paid, has_failed_payment);
 -- Dimension Index
 CREATE NONCLUSTERED INDEX IXDimCustomerBusinessKey
 ON DW.DimCustomer(customer_id, valid_from, valid_to);
+
+
+-- Fact Web Events Indexes
+
+
+CREATE NONCLUSTERED INDEX IXFactWebEventsCustomer
+ON DW.FactWebEvents(customer_key);
+
+CREATE NONCLUSTERED INDEX IXFactWebEventsDate
+ON DW.FactWebEvents(date_key);
+
+CREATE NONCLUSTERED INDEX IXFactWebEventsEventType
+ON DW.FactWebEvents(event_type);
