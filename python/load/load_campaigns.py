@@ -25,3 +25,6 @@ def load_campaigns(df, engine, logger=None):
         if_exists="append",
         index=False
     )
+
+    if logger:
+        logger.info(f"Loaded {len(df)} campaigns")
