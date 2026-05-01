@@ -59,7 +59,7 @@ CREATE TABLE Staging.AWStgSales (
     CustomerID INT,
     OrderDate DATETIME,
     Quantity INT,
-    TotalDue MONEY,
+    LineAmount MONEY,
     CONSTRAINT PK_StgSales PRIMARY KEY (SalesOrderID, ProductID)
 );
 GO
@@ -136,7 +136,7 @@ INSERT INTO Staging.AWStgSales
 	CustomerID,
 	OrderDate,
 	Quantity,
-	TotalDue
+	LineAmount
 )
 SELECT
 	d.SalesOrderID,

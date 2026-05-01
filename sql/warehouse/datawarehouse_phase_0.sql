@@ -22,7 +22,7 @@ CREATE TABLE DW.DimDate (
 
 --Populate DimDate
 WITH DateSeries AS (
-    SELECT CAST('2020-01-01' AS DATE) AS full_date
+    SELECT CAST('2010-01-01' AS DATE) AS full_date
     UNION ALL
     SELECT DATEADD(DAY, 1, full_date)
     FROM DateSeries
