@@ -5,7 +5,7 @@ EcommerceDW is a production-style data engineering project that simulates a real
 It focuses on building scalable ETL pipelines, handling data quality issues, and designing a data warehouse for analytics.
 
 <p align="center">
-<img src="https://github.com/user-attachments/assets/b414665c-6b38-4296-805f-eb7667dd3d68" />
+<img src="https://github.com/user-attachments/assets/8cffd541-5ff1-4a8b-afbc-8046b1e6c23a" />
 </p>
 
 ---
