@@ -1,24 +1,28 @@
 /*
 ===================================================================
-       Create database EcommerceDW: Staging Schema / Phase 1
+                        Orders and Payments
 ===================================================================
 
 -- We're utilizing AdventureWorks2022.bak to restore the database.
--- In this Phase 1, we're applying some updates and continuing to create new tables.
+-- Here, we're applying some updates and continuing to create new tables.
 
 */
 
+------------
+-- ORDERS
+------------
 
 /*
+Staging orders table was created as a placeholder (containing one unique field), and was
+updated later, by utilizing "replace" within df.to_sql() in corresponging Python load script.
+
+
 After some updates, Python code is now generating order_id = str(uuid.uuid4())  # string (varchar),
 but SQL table expects order_id BIGINT
 */
 
 
--- Create/Alter staging tables
-
-
--- Orders staging (simulated/API)
+-- Alter orders staging (simulated/API)
 ALTER TABLE Staging.APIStgOrders
 ALTER COLUMN order_id VARCHAR(50);
 
@@ -43,6 +47,11 @@ CREATE TABLE Staging.APIStgOrdersLoad (
     amount FLOAT,
     status VARCHAR(50)
 );
+
+
+------------
+-- PAYMENTS
+------------
 
 
 -- Payments staging
