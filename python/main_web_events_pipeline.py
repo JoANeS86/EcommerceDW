@@ -4,7 +4,7 @@
 -----------------------------------
 """
 
-from extract.web_events_simulator import generate_web_events
+from extract.json_web_events_simulator import generate_web_events
 from transform.clean_web_events import clean_web_events
 from load.load_web_events import load_web_events
 from utils.logger import get_logger
