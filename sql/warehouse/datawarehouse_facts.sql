@@ -22,7 +22,7 @@ CREATE TABLE DW.FactOrders (
 );
 
 
--- Create Fact Orders Store Procedure
+-- Create Fact Orders Stored Procedure
 CREATE PROCEDURE DW.SPLoadFactOrders
 AS
 BEGIN
@@ -76,11 +76,11 @@ BEGIN
 END;
 
 
--- Execute Store Procedure
+-- Execute Stored Procedure
 EXEC DW.SPLoadFactOrders;
 
 
--- Check Store Procedure Result
+-- Check Stored Procedure Result
 SELECT TOP 100 * FROM DW.FactOrders;
 
 
@@ -131,7 +131,7 @@ CREATE TABLE DW.FactOrders (
 );
 
 
--- Create Fact Orders Store Procedure (v2)
+-- Create Fact Orders Stored Procedure (v2)
 CREATE OR ALTER PROCEDURE DW.SPLoadFactOrders
 AS
 BEGIN
@@ -198,7 +198,7 @@ BEGIN
 END;
 
 
--- Execute Store Procedure
+-- Execute Stored Procedure
 EXEC DW.SPLoadFactOrders;
 
 

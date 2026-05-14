@@ -19,10 +19,8 @@ with integration logic in a data warehouse context.
 -- Create DW.CustomerMapping
 CREATE TABLE DW.CustomerMapping (
     mapping_id INT IDENTITY PRIMARY KEY,
-
     api_customer_id INT,
     aw_customer_id INT,
-
     match_confidence DECIMAL(3,2),  -- realism
     match_type VARCHAR(50)          -- how it was matched
 );
