@@ -13,7 +13,7 @@ SELECT
     SUM(f.order_amount) AS api_revenue,
     SUM(s.sales_amount) AS aw_revenue
 
-FROM Analytics.vw_UnifiedCustomers u
+FROM Analytics.VwUnifiedCustomers u
 
 LEFT JOIN DW.FactOrders f
     ON u.customer_key = f.customer_key

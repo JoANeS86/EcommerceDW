@@ -27,8 +27,12 @@ extractor will be the one directly related to the campaign pipeline.
 import pandas as pd
 import numpy as np
 from datetime import datetime, timedelta
-import random
 import os
+
+# -----------------------------
+# RANDOM GENERATOR
+# -----------------------------
+rng = np.random.default_rng(42)
 
 # -----------------------------
 # CONFIG
@@ -60,34 +64,34 @@ OUTPUT_PATH = os.path.join(
 
 def generate_budget(channel):
     if channel == "Email":
-        return round(np.random.uniform(500, 5000), 2)
+        return round(rng.random.uniform(500, 5000), 2)
     elif channel == "Google Ads":
-        return round(np.random.uniform(8000, 40000), 2)
+        return round(rng.random.uniform(8000, 40000), 2)
     elif channel == "Facebook Ads":
-        return round(np.random.uniform(5000, 30000), 2)
+        return round(rng.random.uniform(5000, 30000), 2)
     elif channel == "Display Ads":
-        return round(np.random.uniform(10000, 50000), 2)
+        return round(rng.random.uniform(10000, 50000), 2)
     elif channel == "Influencer":
-        return round(np.random.uniform(2000, 20000), 2)
+        return round(rng.random.uniform(2000, 20000), 2)
     elif channel == "Affiliate":
-        return round(np.random.uniform(3000, 25000), 2)
+        return round(rng.random.uniform(3000, 25000), 2)
     elif channel == "Organic Search":
-        return round(np.random.uniform(1000, 8000), 2)
+        return round(rng.random.uniform(1000, 8000), 2)
     else:  # Organic Social
-        return round(np.random.uniform(500, 6000), 2)
+        return round(rng.random.uniform(500, 6000), 2)
 
 
 def generate_duration(channel):
-    if channel == "email":
-        return random.randint(1, 7)
-    elif channel in ["paid_search", "paid_social"]:
-        return random.randint(14, 45)
-    elif channel == "display":
-        return random.randint(30, 90)
-    elif channel == "affiliate":
-        return random.randint(20, 60)
-    else:  # organic_social
-        return random.randint(7, 30)
+    if channel == "Email":
+        return rng.random.randint(1, 7)
+    elif channel in ["Google Ads", "Facebook Ads"]:
+        return rng.random.randint(14, 45)
+    elif channel == "Display Ads":
+        return rng.random.randint(30, 90)
+    elif channel == "Affiliate":
+        return rng.random.randint(20, 60)
+    else:  # Organic channels + Influencer
+        return rng.random.randint(7, 30)
 
 
 # -----------------------------
@@ -98,10 +102,10 @@ def generate_campaigns(n_campaigns=N_CAMPAIGNS):
     data = []
 
     for i in range(1, n_campaigns + 1):
-        channel = random.choice(CHANNELS)
+        channel = rng.random.choice(CHANNELS)
 
         # Random start → ensures overlap naturally
-        start_date = START_BASE + timedelta(days=random.randint(0, 300))
+        start_date = START_BASE + timedelta(days=rng.random.randint(0, 300))
 
         duration = generate_duration(channel)
         end_date = start_date + timedelta(days=duration)
