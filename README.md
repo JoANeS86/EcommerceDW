@@ -30,8 +30,8 @@ It focuses on building scalable ETL pipelines, handling data quality issues, and
 
 * Orders (core entity)
 * Payments (linked to orders)
-* Web Events *(planned)*
-* Campaigns *(planned)*
+* Web Events
+* Marketing Campaigns
 
 ---
 
@@ -104,7 +104,8 @@ EcommerceDW/
 
     ✅ Orders pipeline (complete)
     ✅ Payments pipeline (complete)
-    🚧 Data Warehouse layer (in progress)
+    ✅ Data Warehouse layer (complete)
+    🚧 Power BI dashboards (in progress)
 
 ---
 
@@ -117,6 +118,5 @@ EcommerceDW/
 
 ### Next Steps
 
-* Build **FactOrders** table
-* Design **dimension tables**
-* Add **analytics use cases** (cohorts, fraud detection)
+* Build **Analytics / BI layer** in Power BI
+* Extend project (Apache Spark / Databricks)
