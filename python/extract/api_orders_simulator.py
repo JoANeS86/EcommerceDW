@@ -11,22 +11,55 @@ import uuid
 
 fake = Faker()
 
+# -----------------------------------
+# CUSTOMER COHORT SETUP (NEW)
+# -----------------------------------
+
+NUM_CUSTOMERS = 1000
+
+start_date = datetime(2021, 1, 1)
+end_date = datetime(2025, 12, 31)
+
+# Create customer "signup dates" spread across time
+customer_signup = {}
+
+for cid in range(1, NUM_CUSTOMERS + 1):
+
+    # Skew slightly toward earlier customers (more realistic adoption curve)
+    signup_date = fake.date_time_between(
+        start_date=start_date,
+        end_date=end_date
+    )
+
+    customer_signup[cid] = signup_date
+
+
 def generate_orders(n_orders=100000):
     orders = []
 
-    start_date = datetime(2021, 1, 1)
-    end_date = datetime(2025, 12, 31)
-
     duplicate_id = str(uuid.uuid4())  # fixed duplicate
 
+    customer_ids = list(customer_signup.keys())
+
     for i in range(n_orders):
-        order_date = fake.date_time_between(start_date=start_date, end_date=end_date)
+
+        # pick customer
+        customer_id = random.choice(customer_ids)
+
+        # enforce lifecycle constraint (IMPORTANT FIX)
+        signup_date = customer_signup[customer_id]
+
+        # order must happen AFTER signup date
+        order_date = fake.date_time_between(
+            start_date=signup_date,
+            end_date=end_date
+        )
 
         order = {
             "order_id": duplicate_id if i % 5000 == 0 else str(uuid.uuid4()),
-            "customer_id": random.randint(1, 1000),
 
-            # Inject bad data
+            "customer_id": customer_id,
+
             "order_date": random.choices(
                 [order_date, None],
                 weights=[0.97, 0.03]
@@ -36,9 +69,8 @@ def generate_orders(n_orders=100000):
                 round(random.uniform(10, 500), 2),
                 -round(random.uniform(1, 100), 2),
                 None
-                ],
-                weights=[0.90, 0.07, 0.03]
-            )[0],
+            ],
+            weights=[0.90, 0.07, 0.03])[0],
 
             "status": random.choices(
                 ["completed", "pending", "cancelled", None],
@@ -49,6 +81,7 @@ def generate_orders(n_orders=100000):
         orders.append(order)
 
     return orders
+
 
 """
 -----------------------------------
