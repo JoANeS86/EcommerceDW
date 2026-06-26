@@ -17,7 +17,7 @@ fake = Faker()
 
 NUM_CUSTOMERS = 1000
 
-start_date = datetime(2021, 1, 1)
+start_date = datetime(2000, 1, 1)
 end_date = datetime(2025, 12, 31)
 
 # Create customer "signup dates" spread across time

@@ -12,6 +12,7 @@ from sqlalchemy import text
 def get_engine():
     """
     Creates and returns a SQLAlchemy engine for SQL Server.
+    Optimized with fast_executemany for bulk inserts.
     No side effects (safe to import).
     """
     params = urllib.parse.quote_plus(
@@ -21,7 +22,10 @@ def get_engine():
         "Trusted_Connection=yes"
     )
 
-    engine = sa.create_engine(f"mssql+pyodbc:///?odbc_connect={params}")
+    engine = sa.create_engine(
+        f"mssql+pyodbc:///?odbc_connect={params}",
+        fast_executemany=True
+    )
 
     return engine
 

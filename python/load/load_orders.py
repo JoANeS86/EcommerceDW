@@ -30,7 +30,7 @@ def load_orders(df, engine, logger=None):
             schema="Staging",
             if_exists="append",
             index=False,
-            chunksize=10000
+            chunksize=50000
         )
 
         if logger:

@@ -43,7 +43,7 @@ def generate_payments(n_payments=100000):
     payment_methods = ["credit_card", "paypal", "bank_transfer"]
     statuses = ["completed", "failed", "refunded"]
 
-    start_date = datetime(2021, 1, 1)
+    start_date = datetime(2000, 1, 1)
     end_date = datetime(2025, 12, 31)
 
     for i in range(n_payments):

@@ -9,7 +9,7 @@ import random
 from datetime import timedelta
 from faker import Faker
 from sqlalchemy import text
-from python.config.db_config import engine
+from config.db_config import engine
 
 fake = Faker()
 
