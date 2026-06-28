@@ -458,7 +458,7 @@ CREATE TABLE DW.AWFactSales (
     date_key INT,
     sales_amount DECIMAL(10,2),
     FOREIGN KEY (customer_key_aw) REFERENCES DW.AWDimCustomer(customer_key_aw),
-    FOREIGN KEY (product_key) REFERENCES DW.AWDimProduct(product_key),
+    FOREIGN KEY (product_key) REFERENCES DW.DimProduct(product_key),
     FOREIGN KEY (date_key) REFERENCES DW.DimDate(date_key)
 );
 
