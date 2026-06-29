@@ -7,7 +7,7 @@
 
 
 -- Create Unified Orders
-CREATE VIEW Analytics.VwFactOrders AS
+CREATE VIEW Analytics.VwOrders AS
 SELECT
     f.*,
     u.unified_customer_key
@@ -19,7 +19,7 @@ JOIN DW.DimCustomerUnified u
 
 
 -- Create Unified Fact Web Events
-CREATE VIEW Analytics.VwFactWebEvents AS
+CREATE VIEW Analytics.VwWebEvents AS
 SELECT
     we.*,
     u.unified_customer_key
@@ -31,7 +31,7 @@ JOIN DW.DimCustomerUnified u
 
 
 -- Create Unified AW Sales
-CREATE VIEW Analytics.VwAWFactSales AS
+CREATE VIEW Analytics.VwAWSales AS
 SELECT
     s.*,
     u.unified_customer_key
