@@ -15,9 +15,9 @@ fake = Faker()
 # CUSTOMER COHORT SETUP (NEW)
 # -----------------------------------
 
-NUM_CUSTOMERS = 1000
+NUM_CUSTOMERS = 2000
 
-start_date = datetime(2000, 1, 1)
+start_date = datetime(2021, 1, 1)
 end_date = datetime(2025, 12, 31)
 
 # Create customer "signup dates" spread across time
@@ -34,7 +34,7 @@ for cid in range(1, NUM_CUSTOMERS + 1):
     customer_signup[cid] = signup_date
 
 
-def generate_orders(n_orders=100000):
+def generate_orders(n_orders=200000):
     orders = []
 
     duplicate_id = str(uuid.uuid4())  # fixed duplicate

@@ -18,7 +18,7 @@ fake = Faker()
 # FETCH REAL ORDER IDS
 # -----------------------------------
 
-def get_real_orders(sample_size=50000):
+def get_real_orders(sample_size=100000):
     query = text(f"""
         SELECT TOP ({sample_size}) order_id, order_date
         FROM Staging.APIStgOrders
@@ -35,7 +35,7 @@ def get_real_orders(sample_size=50000):
 # GENERATE PAYMENTS
 # -----------------------------------
 
-def generate_payments(n_payments=100000):
+def generate_payments(n_payments=200000):
     payments = []
 
     real_orders = get_real_orders()
@@ -43,7 +43,7 @@ def generate_payments(n_payments=100000):
     payment_methods = ["credit_card", "paypal", "bank_transfer"]
     statuses = ["completed", "failed", "refunded"]
 
-    start_date = datetime(2000, 1, 1)
+    start_date = datetime(2021, 1, 1)
     end_date = datetime(2025, 12, 31)
 
     for i in range(n_payments):
