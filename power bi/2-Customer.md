@@ -12,3 +12,5 @@
     )
 
     Repeat Rate = DIVIDE([Repeat Customers], [Total Customers])
+
+    Average Orders per Customer = DIVIDE([Total Orders], [Total Customers])
