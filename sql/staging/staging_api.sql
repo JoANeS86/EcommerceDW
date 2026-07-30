@@ -30,12 +30,12 @@ ALTER COLUMN order_id VARCHAR(50);
 -- Watermark staging
 CREATE TABLE Staging.ETLWatermark (
     pipeline_name VARCHAR(100) PRIMARY KEY,
-    last_order_date DATETIME
+    last_processed_datetime DATETIME
 );
 
 
 -- Populate Watermark (initial value)
-INSERT INTO Staging.ETLWatermark (pipeline_name, last_order_date)
+INSERT INTO Staging.ETLWatermark (pipeline_name, last_processed_datetime)
 VALUES ('orders_pipeline', '1900-01-01');
 
 
@@ -79,5 +79,5 @@ CREATE TABLE Staging.APIStgPaymentsLoad (
 
 
 -- Update Watermark
-INSERT INTO Staging.ETLWatermark (pipeline_name, last_order_date)
+INSERT INTO Staging.ETLWatermark (pipeline_name, last_processed_datetime)
 VALUES ('payments_pipeline', '1900-01-01');

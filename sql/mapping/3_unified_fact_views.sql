@@ -9,13 +9,44 @@
 -- Create Unified Orders
 CREATE VIEW Analytics.VwOrders AS
 SELECT
-    f.*,
-    u.unified_customer_key
+    f.order_key,
+	f.order_id,
+	u.unified_customer_key,
+	f.customer_key,
+	f.date_key,
+    f.order_amount,
+	f.total_paid_amount,
+	f.payment_count,
+	f.has_failed_payment,
+	f.order_count,
+	f.is_fully_paid,
+	f.payment_gap
 FROM DW.FactOrders f
 JOIN DW.DimCustomer dc
     ON f.customer_key = dc.customer_key
 JOIN DW.DimCustomerUnified u
     ON dc.customer_id = u.api_customer_id;
+
+
+-- Create Orders Dim View
+CREATE VIEW Analytics.VwOrdersDim AS
+SELECT DISTINCT
+    order_key,
+    order_id
+FROM DW.FactOrders;
+
+
+-- Create Payments View
+CREATE VIEW Analytics.VwPayments AS
+SELECT
+    payment_id,
+    order_key,
+    order_id,
+    date_key,
+    payment_amount,
+    payment_method,
+    payment_status
+FROM DW.FactPayments;
 
 
 -- Create Unified Fact Web Events

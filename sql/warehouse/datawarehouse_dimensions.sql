@@ -183,6 +183,47 @@ SET IDENTITY_INSERT DW.DimCustomer OFF;
 
 /*
 ===================================================================
+                        Dimension Order
+===================================================================
+
+*/
+
+
+-- Create DimOrder
+CREATE TABLE DW.DimOrder (
+    order_key INT IDENTITY(1,1) PRIMARY KEY,
+    order_id VARCHAR(40) NOT NULL
+);
+
+
+INSERT INTO DW.DimOrder (order_id)
+SELECT DISTINCT order_id
+FROM DW.FactOrders;
+
+
+ALTER TABLE DW.FactOrders
+ADD order_key INT;
+
+ALTER TABLE DW.FactPayments
+ADD order_key INT;
+
+
+UPDATE f
+SET f.order_key = d.order_key
+FROM DW.FactOrders f
+JOIN DW.DimOrder d
+    ON f.order_id = d.order_id;
+
+
+UPDATE f
+SET f.order_key = d.order_key
+FROM DW.FactPayments f
+JOIN DW.DimOrder d
+    ON f.order_id = d.order_id;
+
+
+/*
+===================================================================
                   Dimension Marketing Campaign
 ===================================================================
 

@@ -10,7 +10,7 @@ from datetime import datetime
 
 def get_watermark(engine, pipeline_name):
     query = text("""
-        SELECT last_order_date
+        SELECT last_processed_datetime
         FROM Staging.ETLWatermark
         WHERE pipeline_name = :pipeline_name
     """)
@@ -28,7 +28,7 @@ def get_watermark(engine, pipeline_name):
 def update_watermark(engine, pipeline_name, new_watermark):
     query = text("""
         UPDATE Staging.ETLWatermark
-        SET last_order_date = :new_watermark
+        SET last_processed_datetime = :new_watermark
         WHERE pipeline_name = :pipeline_name
     """)
 
