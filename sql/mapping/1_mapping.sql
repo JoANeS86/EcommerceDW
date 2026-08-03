@@ -19,37 +19,44 @@ with integration logic in a data warehouse context.
 -- Create DW.CustomerMapping
 CREATE TABLE DW.CustomerMapping (
     mapping_id INT IDENTITY PRIMARY KEY,
-    api_customer_id INT,
-    aw_customer_id INT,
+    api_customer_key INT,
+    aw_customer_key INT,
     match_confidence DECIMAL(3,2),  -- realism
     match_type VARCHAR(50)          -- how it was matched
 );
 
 
 -- Populate DW.CustomerMapping
+WITH AWCommonCustomers AS (
+    SELECT TOP (1000)
+        customer_key_aw,
+        customer_id_aw,
+        ABS(customer_id_aw % 10000) AS common_customer_id_aw
+    FROM DW.AWDimCustomer
+)
 INSERT INTO DW.CustomerMapping (
-    api_customer_id,
-    aw_customer_id,
+    api_customer_key,
+    aw_customer_key,
     match_confidence,
     match_type
 )
-SELECT TOP 300
-    dc.customer_id,
-    aw.customer_id_aw,
+SELECT
+    dc.customer_key,
+    aw.customer_key_aw,
     ROUND(RAND(CHECKSUM(NEWID())), 2),
     'simulated_match'
-FROM DW.DimCustomer dc
-JOIN DW.AWDimCustomer aw
-    ON ABS(dc.customer_id % 1000) = ABS(aw.customer_id_aw % 1000);
+FROM DW.DimCustomer AS dc
+JOIN AWCommonCustomers AS aw
+    ON dc.customer_id = aw.common_customer_id_aw
+WHERE dc.is_current = 1;
 
 
 -- Create View
 CREATE VIEW Analytics.VwUnifiedCustomers AS
 SELECT
-    dc.customer_key,
-    dc.customer_id AS api_customer_id,
-    m.aw_customer_id,
+    dc.customer_key AS api_customer_key,
+    m.aw_customer_key,
     m.match_confidence
 FROM DW.DimCustomer dc
 LEFT JOIN DW.CustomerMapping m
-    ON dc.customer_id = m.api_customer_id;
+    ON dc.customer_key = m.api_customer_key;

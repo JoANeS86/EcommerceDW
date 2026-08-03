@@ -25,7 +25,7 @@ FROM DW.FactOrders f
 JOIN DW.DimCustomer dc
     ON f.customer_key = dc.customer_key
 JOIN DW.DimCustomerUnified u
-    ON dc.customer_id = u.api_customer_id;
+    ON dc.customer_key = u.api_customer_key;
 
 
 -- Create Orders Dim View
@@ -58,7 +58,7 @@ FROM DW.FactWebEvents we
 JOIN DW.DimCustomer dc
     ON we.customer_key = dc.customer_key
 JOIN DW.DimCustomerUnified u
-    ON dc.customer_id = u.api_customer_id;
+    ON dc.customer_key = u.api_customer_key;
 
 
 -- Create Unified AW Sales
@@ -70,4 +70,4 @@ FROM DW.AWFactSales s
 JOIN DW.AWDimCustomer aw
     ON s.customer_key_aw = aw.customer_key_aw
 JOIN DW.DimCustomerUnified u
-    ON aw.customer_id_aw = u.aw_customer_id;
+    ON aw.customer_key_aw = u.aw_customer_key;
