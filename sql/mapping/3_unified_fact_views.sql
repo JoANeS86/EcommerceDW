@@ -62,12 +62,17 @@ JOIN DW.DimCustomerUnified u
 
 
 -- Create Unified AW Sales
-CREATE VIEW Analytics.VwAWSales AS
+CREATE OR ALTER VIEW Analytics.VwAWSales
+AS
 SELECT
     s.*,
     u.unified_customer_key
-FROM DW.AWFactSales s
-JOIN DW.AWDimCustomer aw
+
+FROM DW.AWFactSales AS s
+
+LEFT JOIN DW.AWDimCustomer AS aw
     ON s.customer_key_aw = aw.customer_key_aw
-JOIN DW.DimCustomerUnified u
+
+LEFT JOIN DW.DimCustomerUnified AS u
     ON aw.customer_key_aw = u.aw_customer_key;
+GO

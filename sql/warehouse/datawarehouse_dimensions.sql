@@ -286,41 +286,118 @@ FROM Staging.AWStgCustomers;
 
 
 -- Create DimProduct
-CREATE TABLE DW.DimProduct (
-    product_key INT IDENTITY PRIMARY KEY,
-    product_id INT,
-    product_name VARCHAR(100),
-    category VARCHAR(50)
+IF OBJECT_ID('DW.DimProduct', 'U') IS NOT NULL
+    DROP TABLE DW.DimProduct;
+GO
+
+CREATE TABLE DW.DimProduct
+(
+    product_key             INT IDENTITY(1,1) PRIMARY KEY,
+
+    product_id              INT NOT NULL,
+    product_number          VARCHAR(25),
+    product_name            VARCHAR(100),
+
+    category                VARCHAR(50),
+    subcategory             VARCHAR(50),
+
+    color                   VARCHAR(30),
+
+    standard_cost           DECIMAL(18,2),
+    list_price              DECIMAL(18,2),
+
+    make_flag               BIT,
+    finished_goods_flag     BIT,
+
+    days_to_manufacture     INT,
+
+    sell_start_date         DATE,
+    sell_end_date           DATE NULL,
+    discontinued_date       DATE NULL
 );
+GO
 
 
 -- Populate DimProduct
-INSERT INTO DW.DimProduct (
+INSERT INTO DW.DimProduct
+(
     product_id,
+    product_number,
     product_name,
-    category
+    category,
+    subcategory,
+    color,
+    standard_cost,
+    list_price,
+    make_flag,
+    finished_goods_flag,
+    days_to_manufacture,
+    sell_start_date,
+    sell_end_date,
+    discontinued_date
 )
-SELECT DISTINCT
-    ProductID,
-    Name,
-    Color   -- simple proxy for category
-FROM Staging.AWStgProducts;
+SELECT
+    p.ProductID,
+    p.ProductNumber,
+    p.Name,
+
+    pc.Name AS category,
+    ps.Name AS subcategory,
+
+    p.Color,
+
+    CAST(p.StandardCost AS DECIMAL(18,2)),
+    CAST(p.ListPrice AS DECIMAL(18,2)),
+
+    p.MakeFlag,
+    p.FinishedGoodsFlag,
+
+    p.DaysToManufacture,
+
+    CAST(p.SellStartDate AS DATE),
+    CAST(p.SellEndDate AS DATE),
+    CAST(p.DiscontinuedDate AS DATE)
+
+FROM Staging.AWStgProducts p
+
+LEFT JOIN Production.ProductSubcategory ps
+    ON p.ProductSubcategoryID = ps.ProductSubcategoryID
+
+LEFT JOIN Production.ProductCategory pc
+    ON ps.ProductCategoryID = pc.ProductCategoryID;
+GO
 
 
 -- Create DimGeography
-CREATE TABLE DW.DimGeography (
-    geography_key INT IDENTITY PRIMARY KEY,
-    country VARCHAR(50),
-    region VARCHAR(50)
+IF OBJECT_ID('DW.DimGeography', 'U') IS NOT NULL
+    DROP TABLE DW.DimGeography;
+GO
+
+CREATE TABLE DW.DimGeography
+(
+    geography_key       INT IDENTITY(1,1) PRIMARY KEY,
+
+    territory_id        INT NOT NULL,
+    territory_name      VARCHAR(50),
+
+    country_code        VARCHAR(3),
+    region              VARCHAR(50)
 );
+GO
 
 
 -- Populate DimGeography
-INSERT INTO DW.DimGeography (
-    country,
+INSERT INTO DW.DimGeography
+(
+    territory_id,
+    territory_name,
+    country_code,
     region
 )
-SELECT DISTINCT
+SELECT
+    TerritoryID,
+    Name,
     CountryRegionCode,
     GroupName
 FROM Staging.AWStgTerritories;
+GO

@@ -588,41 +588,83 @@ WHERE NOT EXISTS (
 
 
 -- Create AWFactSales
-CREATE TABLE DW.AWFactSales (
-    sales_id INT IDENTITY PRIMARY KEY,
-    customer_key_aw INT,
-    product_key INT,
-    date_key INT,
-    sales_amount DECIMAL(10,2),
-    FOREIGN KEY (customer_key_aw) REFERENCES DW.AWDimCustomer(customer_key_aw),
-    FOREIGN KEY (product_key) REFERENCES DW.DimProduct(product_key),
-    FOREIGN KEY (date_key) REFERENCES DW.DimDate(date_key)
+IF OBJECT_ID('DW.AWFactSales', 'U') IS NOT NULL
+    DROP TABLE DW.AWFactSales;
+GO
+
+CREATE TABLE DW.AWFactSales
+(
+    sales_id            INT IDENTITY(1,1) PRIMARY KEY,
+
+    sales_order_id      INT NOT NULL,
+
+    customer_key_aw     INT,
+    product_key         INT,
+    date_key            INT,
+    geography_key       INT,
+
+    quantity            INT,
+    sales_amount        DECIMAL(12,2),
+
+    CONSTRAINT FK_AWFactSales_Customer
+        FOREIGN KEY (customer_key_aw)
+        REFERENCES DW.AWDimCustomer(customer_key_aw),
+
+    CONSTRAINT FK_AWFactSales_Product
+        FOREIGN KEY (product_key)
+        REFERENCES DW.DimProduct(product_key),
+
+    CONSTRAINT FK_AWFactSales_Date
+        FOREIGN KEY (date_key)
+        REFERENCES DW.DimDate(date_key),
+
+    CONSTRAINT FK_AWFactSales_Geography
+        FOREIGN KEY (geography_key)
+        REFERENCES DW.DimGeography(geography_key)
 );
+GO
 
 
 -- Populate AWFactSales
-INSERT INTO DW.AWFactSales (
+INSERT INTO DW.AWFactSales
+(
+    sales_order_id,
     customer_key_aw,
     product_key,
     date_key,
+    geography_key,
+    quantity,
     sales_amount
 )
 SELECT
+    s.SalesOrderID,
+
     dc.customer_key_aw,
+
     dp.product_key,
+
     dd.date_key,
-    s.LineAmount   -- line-level amount
 
-FROM Staging.AWStgSales s
+    dg.geography_key,
 
-LEFT JOIN DW.AWDimCustomer dc
+    s.Quantity,
+
+    CAST(s.LineAmount AS DECIMAL(12,2))
+
+FROM Staging.AWStgSales AS s
+
+LEFT JOIN DW.AWDimCustomer AS dc
     ON s.CustomerID = dc.customer_id_aw
 
-LEFT JOIN DW.DimProduct dp
+LEFT JOIN DW.DimProduct AS dp
     ON s.ProductID = dp.product_id
 
-LEFT JOIN DW.DimDate dd
-    ON CAST(s.OrderDate AS DATE) = dd.full_date;
+LEFT JOIN DW.DimDate AS dd
+    ON CAST(s.OrderDate AS DATE) = dd.full_date
+
+LEFT JOIN DW.DimGeography AS dg
+    ON s.TerritoryID = dg.territory_id;
+GO
 
 
 -- Validation

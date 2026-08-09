@@ -29,38 +29,65 @@ GO
 
   
 -- Products staging
-CREATE TABLE Staging.AWStgProducts (
-    ProductID INT PRIMARY KEY,
-    Name NVARCHAR(100),
-    ProductNumber NVARCHAR(25),
-    Color NVARCHAR(15),
-    StandardCost MONEY,
-    ListPrice MONEY,
-    ModifiedDate DATETIME
+IF OBJECT_ID('Staging.AWStgProducts', 'U') IS NOT NULL
+    DROP TABLE Staging.AWStgProducts;
+GO
+
+CREATE TABLE Staging.AWStgProducts
+(
+    ProductID              INT,
+    Name                    NVARCHAR(50),
+    ProductNumber           NVARCHAR(25),
+    ProductSubcategoryID    INT NULL,
+    Color                   NVARCHAR(15) NULL,
+    StandardCost            MONEY,
+    ListPrice               MONEY,
+    MakeFlag                BIT,
+    FinishedGoodsFlag       BIT,
+    SafetyStockLevel        SMALLINT,
+    ReorderPoint            SMALLINT,
+    DaysToManufacture       INT,
+    SellStartDate           DATETIME,
+    SellEndDate             DATETIME NULL,
+    DiscontinuedDate         DATETIME NULL,
+    ModifiedDate             DATETIME
 );
 GO
 
 
 -- Territories staging
-CREATE TABLE Staging.AWStgTerritories (
-    TerritoryID INT PRIMARY KEY,
-    Name NVARCHAR(50),
-    CountryRegionCode NVARCHAR(3),
-    GroupName NVARCHAR(50),  -- "Group" is a reserved word, renamed
-    ModifiedDate DATETIME
+IF OBJECT_ID('Staging.AWStgTerritories', 'U') IS NOT NULL
+    DROP TABLE Staging.AWStgTerritories;
+GO
+
+CREATE TABLE Staging.AWStgTerritories
+(
+    TerritoryID         INT PRIMARY KEY,
+    Name                 NVARCHAR(50),
+    CountryRegionCode    NVARCHAR(3),
+    GroupName            NVARCHAR(50),
+    ModifiedDate         DATETIME
 );
 GO
 
 
 -- Sales staging
-CREATE TABLE Staging.AWStgSales (
-    SalesOrderID INT NOT NULL,
-    ProductID INT NOT NULL,
-    CustomerID INT,
-    OrderDate DATETIME,
-    Quantity INT,
-    LineAmount MONEY,
-    CONSTRAINT PK_StgSales PRIMARY KEY (SalesOrderID, ProductID)
+IF OBJECT_ID('Staging.AWStgSales', 'U') IS NOT NULL
+    DROP TABLE Staging.AWStgSales;
+GO
+
+CREATE TABLE Staging.AWStgSales
+(
+    SalesOrderID    INT NOT NULL,
+    ProductID       INT NOT NULL,
+    CustomerID      INT NULL,
+    TerritoryID     INT NULL,
+    OrderDate       DATETIME,
+    Quantity        INT,
+    LineAmount      MONEY,
+
+    CONSTRAINT PK_StgSales
+        PRIMARY KEY (SalesOrderID, ProductID)
 );
 GO
 
@@ -92,62 +119,84 @@ LEFT JOIN Person.PersonPhone AS ph ON p.BusinessEntityID = ph.BusinessEntityID;
 
 INSERT INTO Staging.AWStgProducts
 (
-	ProductID,
-	Name,
-	ProductNumber,
-	Color,
-	StandardCost,
-	ListPrice,
-	ModifiedDate
+    ProductID,
+    Name,
+    ProductNumber,
+    ProductSubcategoryID,
+    Color,
+    StandardCost,
+    ListPrice,
+    MakeFlag,
+    FinishedGoodsFlag,
+    SafetyStockLevel,
+    ReorderPoint,
+    DaysToManufacture,
+    SellStartDate,
+    SellEndDate,
+    DiscontinuedDate,
+    ModifiedDate
 )
 SELECT
-	ProductID,
-	Name,
-	ProductNumber,
-	Color,
-	StandardCost,
-	ListPrice,
-	ModifiedDate
+    ProductID,
+    Name,
+    ProductNumber,
+    ProductSubcategoryID,
+    Color,
+    StandardCost,
+    ListPrice,
+    MakeFlag,
+    FinishedGoodsFlag,
+    SafetyStockLevel,
+    ReorderPoint,
+    DaysToManufacture,
+    SellStartDate,
+    SellEndDate,
+    DiscontinuedDate,
+    ModifiedDate
 FROM Production.Product;
+GO
 
 
 INSERT INTO Staging.AWStgTerritories
 (
-	TerritoryID,
-	Name,
-	CountryRegionCode,
-	GroupName,
-	ModifiedDate
+    TerritoryID,
+    Name,
+    CountryRegionCode,
+    GroupName,
+    ModifiedDate
 )
 SELECT
-	TerritoryID,
-	Name,
-	CountryRegionCode,
-	[Group],
-	ModifiedDate
+    TerritoryID,
+    Name,
+    CountryRegionCode,
+    [Group],
+    ModifiedDate
 FROM Sales.SalesTerritory;
+GO
 
 
 -- Sales (flattened per line item)
 INSERT INTO Staging.AWStgSales
 (
-	SalesOrderID,
-	ProductID,
-	CustomerID,
-	OrderDate,
-	Quantity,
-	LineAmount
+    SalesOrderID,
+    ProductID,
+    CustomerID,
+    TerritoryID,
+    OrderDate,
+    Quantity,
+    LineAmount
 )
 SELECT
-	d.SalesOrderID,
+    d.SalesOrderID,
     d.ProductID,
     h.CustomerID,
+    h.TerritoryID,
     h.OrderDate,
     d.OrderQty,
     d.LineTotal
 FROM Sales.SalesOrderDetail AS d
-JOIN Sales.SalesOrderHeader AS h
-  ON d.SalesOrderID = h.SalesOrderID;
+INNER JOIN Sales.SalesOrderHeader AS h
+    ON d.SalesOrderID = h.SalesOrderID;
 GO
 
 
