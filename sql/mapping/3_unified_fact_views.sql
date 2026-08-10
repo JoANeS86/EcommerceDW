@@ -37,9 +37,10 @@ FROM DW.FactOrders;
 
 
 -- Create Payments View
-CREATE VIEW Analytics.VwPayments AS
+CREATE OR ALTER VIEW Analytics.VwPayments AS
 SELECT
     payment_id,
+    payment_reference,
     order_key,
     order_id,
     date_key,

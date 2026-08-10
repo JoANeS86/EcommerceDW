@@ -59,6 +59,7 @@ DROP TABLE IF EXISTS Staging.APIStgPayments;
 
 CREATE TABLE Staging.APIStgPayments (
     payment_id UNIQUEIDENTIFIER PRIMARY KEY,
+    payment_reference VARCHAR(100),
     order_id UNIQUEIDENTIFIER,
     payment_date DATETIME,
     amount DECIMAL(10,2),
@@ -70,6 +71,7 @@ CREATE TABLE Staging.APIStgPayments (
 -- Payments load staging
 CREATE TABLE Staging.APIStgPaymentsLoad (
     payment_id UNIQUEIDENTIFIER,
+    payment_reference VARCHAR(100),
     order_id UNIQUEIDENTIFIER,
     payment_date DATETIME,
     amount DECIMAL(10,2),

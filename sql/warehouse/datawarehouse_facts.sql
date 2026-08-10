@@ -404,8 +404,12 @@ EXEC DW.SPLoadFactOrdersIncremental;
 
 
 -- Create Fact Orders Table
+DROP TABLE IF EXISTS DW.FactPayments;
+
 CREATE TABLE DW.FactPayments (
     payment_id UNIQUEIDENTIFIER PRIMARY KEY,
+    payment_reference VARCHAR(100),
+    order_key INT,
     order_id UNIQUEIDENTIFIER,
     date_key INT,
     payment_amount DECIMAL(10,2),
@@ -427,97 +431,154 @@ VALUES ('fact_payments_load', '1900-01-01');
 CREATE OR ALTER PROCEDURE DW.SPLoadFactPaymentsIncremental
 AS
 BEGIN
-    SET NOCOUNT ON;
+SET NOCOUNT ON;
 
-    BEGIN TRY
+BEGIN TRY
 
-        DECLARE @watermark DATETIME;
-        DECLARE @adjusted_watermark DATETIME;
-        DECLARE @buffer_days INT = 3;
+    DECLARE @watermark DATETIME;
+    DECLARE @adjusted_watermark DATETIME;
+    DECLARE @buffer_days INT = 3;
 
-        -- Get watermark
-        SELECT @watermark = last_processed_datetime
-        FROM Staging.ETLWatermark
-        WHERE pipeline_name = 'fact_payments_load';
+    -- =====================================================
+    -- GET WATERMARK
+    -- =====================================================
 
-        SET @adjusted_watermark = DATEADD(DAY, -@buffer_days, @watermark);
+    SELECT @watermark = last_processed_datetime
+    FROM Staging.ETLWatermark
+    WHERE pipeline_name = 'fact_payments_load';
 
-        PRINT 'Watermark: ' + CAST(@watermark AS VARCHAR);
-        PRINT 'Adjusted watermark: ' + CAST(@adjusted_watermark AS VARCHAR);
+    SET @adjusted_watermark =
+        DATEADD(DAY, -@buffer_days, @watermark);
 
-        -- Build incremental dataset
-        WITH PaymentsIncremental AS (
-            SELECT
-                payment_id,
-                order_id,
-                payment_date,
-                amount,
-                payment_method,
-                status
-            FROM Staging.APIStgPayments
-            WHERE payment_date > @adjusted_watermark
+    PRINT 'Watermark: ' + CAST(@watermark AS VARCHAR);
+    PRINT 'Adjusted watermark: '
+        + CAST(@adjusted_watermark AS VARCHAR);
+
+
+    -- =====================================================
+    -- BUILD INCREMENTAL DATASET
+    -- =====================================================
+
+    WITH PaymentsIncremental AS (
+
+        SELECT
+            payment_id,
+            payment_reference,
+            order_id,
+            payment_date,
+            amount,
+            payment_method,
+            status
+
+        FROM Staging.APIStgPayments
+
+        WHERE payment_date > @adjusted_watermark
+    )
+
+
+    -- =====================================================
+    -- MERGE INTO FACT PAYMENTS
+    -- =====================================================
+
+    MERGE DW.FactPayments AS target
+
+    USING (
+
+        SELECT
+            p.payment_id,
+            p.payment_reference,
+            o.order_key,
+            p.order_id,
+            dd.date_key,
+            p.amount AS payment_amount,
+            p.payment_method,
+            p.status AS payment_status
+
+        FROM PaymentsIncremental p
+
+        INNER JOIN DW.FactOrders o
+            ON p.order_id = o.order_id
+
+        INNER JOIN DW.DimDate dd
+            ON CAST(p.payment_date AS DATE)
+               = dd.full_date
+
+    ) AS source
+
+    ON target.payment_id = source.payment_id
+
+
+    -- =====================================================
+    -- UPDATE EXISTING PAYMENTS
+    -- =====================================================
+
+    WHEN MATCHED THEN
+
+        UPDATE SET
+            payment_reference = source.payment_reference,
+            order_key = source.order_key,
+            order_id = source.order_id,
+            date_key = source.date_key,
+            payment_amount = source.payment_amount,
+            payment_method = source.payment_method,
+            payment_status = source.payment_status
+
+
+    -- =====================================================
+    -- INSERT NEW PAYMENTS
+    -- =====================================================
+
+    WHEN NOT MATCHED THEN
+
+        INSERT (
+            payment_id,
+            payment_reference,
+            order_key,
+            order_id,
+            date_key,
+            payment_amount,
+            payment_method,
+            payment_status
         )
 
-        MERGE DW.FactPayments AS target
-        USING (
-            SELECT
-                p.payment_id,
-                p.order_id,
-                dd.date_key,
-                p.amount AS payment_amount,
-		        p.payment_method,
-		        p.status AS payment_status
+        VALUES (
+            source.payment_id,
+            source.payment_reference,
+            source.order_key,
+            source.order_id,
+            source.date_key,
+            source.payment_amount,
+            source.payment_method,
+            source.payment_status
+        );
 
-            FROM PaymentsIncremental p
 
-            INNER JOIN DW.DimDate dd
-                ON CAST(p.payment_date AS DATE) = dd.full_date
+    -- =====================================================
+    -- UPDATE WATERMARK
+    -- =====================================================
 
-        ) AS source
+    UPDATE Staging.ETLWatermark
 
-        ON target.payment_id = source.payment_id
+    SET last_processed_datetime = (
+        SELECT MAX(payment_date)
+        FROM Staging.APIStgPayments
+    )
 
-        WHEN MATCHED THEN
-            UPDATE SET
-                order_id = source.order_id,
-                date_key = source.date_key,
-                payment_amount = source.payment_amount,
-                payment_method = source.payment_method,
-                payment_status = source.payment_status
+    WHERE pipeline_name = 'fact_payments_load';
 
-        WHEN NOT MATCHED THEN
-            INSERT (
-                payment_id,
-                order_id,
-                date_key,
-                payment_amount,
-                payment_method,
-                payment_status
-            )
-            VALUES (
-                source.payment_id,
-                source.order_id,
-                source.date_key,
-                source.payment_amount,
-                source.payment_method,
-                source.payment_status
-            );
 
-        -- Update watermark
-        UPDATE Staging.ETLWatermark
-        SET last_processed_datetime = (
-            SELECT MAX(payment_date)
-            FROM Staging.APIStgPayments
-        )
-        WHERE pipeline_name = 'fact_payments_load';
+    PRINT 'Incremental FactPayments load completed';
 
-        PRINT 'Incremental FactPayments load completed';
+END TRY
 
-    END TRY
-    BEGIN CATCH
-        PRINT 'Error in incremental FactPayments load';
-        THROW;
-    END CATCH
+BEGIN CATCH
+
+    PRINT 'Error in incremental FactPayments load';
+
+    THROW;
+
+END CATCH
+
 END;
 
 
